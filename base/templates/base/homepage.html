@@ -5,9 +5,14 @@
 <h1>Homepage Template</h1>
 
 <div>
+
+    
+    <a href="{% url 'create-customer' %}"> Create Customer</a>
     <div>
         {% for customer in customers %}
             <div>
+                <a href="{% url 'update-customer' customer.id %}">Edit</a>
+                <a href="{% url 'delete-customer' customer.id %}">Delete</a>
                 <h5>{{customer.id}} -- <a href="{% url 'customer' customer.id %}">{{customer.name}}</a></h5>
             </div>
         {% endfor %}

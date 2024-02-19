@@ -11,6 +11,9 @@ class Admin(models.Model):
     created = models.DateTimeField("created", auto_now_add=True)
     updated = models.DateTimeField("updated", auto_now=True)
     
+    class Meta:
+        db_table = "admin"
+    
     def admin(self):
         return Admin
 
@@ -19,17 +22,21 @@ class Customer(models.Model):
     email = models.CharField("email", max_length=200)
     name = models.CharField("name", max_length=200)
     password = models.CharField("password", max_length=200)
-    idCard = models.CharField("idCard", max_length=200)
-    licenceCard = models.CharField("licenseCard", max_length=200)
-    phoneNumber = models.CharField("phoneNumber", max_length=200)
+    id_card = models.CharField("idCard", max_length=200)
+    license_card = models.CharField("licenseCard", max_length=200)
+    phone_number = models.CharField("phoneNumber", max_length=200)
     status = models.CharField("status", max_length=200)
     created = models.DateTimeField("created", auto_now_add=True)
     updated = models.DateTimeField("updated", auto_now=True)
     #approvedBy
     #approvedDate
     
-    def customer(self):
-        return Customer
+    class Meta:
+        db_table = "customer"
+        ordering = ['created', 'updated']
+    
+    def __str__(self):
+        return self.name
 
 class Provider(models.Model):
     # provider_id = models.BigAutoField(primary_key=True)
@@ -51,6 +58,9 @@ class Provider(models.Model):
     # approved_by = models.ForeignKey(Admin, on_delete=models.SET_NULL, null = True)
     updated_datetime = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        db_table = "provider"
+    
     def provider(self):
         return Provider
 
@@ -62,7 +72,7 @@ class Car(models.Model):
     color = models.CharField(max_length=20)
     seat = models.PositiveIntegerField()
     vehicle_no = models.CharField(max_length=15)
-    trasmission = models.CharField(max_length=10)
+    transmission = models.CharField(max_length=10)
     price = models.DecimalField(max_digits=6, decimal_places=0)
     deposit = models.DecimalField(max_digits=6, decimal_places=0, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -70,7 +80,9 @@ class Car(models.Model):
     created_datetime = models.DateTimeField(auto_now_add=True)
     updated_datetime = models.DateTimeField(auto_now=True)
     # updated_by
-    
+    class Meta:
+        db_table = "car"
+            
     def car(self):
         return Car
 # one car have one or many car file
@@ -80,7 +92,10 @@ class CarFile(models.Model):
     file_path = models.CharField(max_length=200)
     file_type = models.CharField(max_length=5)
     created_datetime = models.DateTimeField(auto_now_add=True)
-    
+
+    class Meta:
+        db_table = "car_file"
+            
     def car_file(self):
         return CarFile
 
@@ -88,6 +103,9 @@ class ChatRoom(models.Model):
     # chat_room_id = models.BigAutoField(primary_key=True)
     provider_id = models.ForeignKey(Provider, on_delete=models.CASCADE)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    
+    class Meta:
+        db_table = "chat_room"
     
     def chat_room(self):
         return ChatRoom
@@ -98,6 +116,9 @@ class Chat(models.Model):
     message = models.TextField()
     file_path = models.CharField(max_length=200)
     created = models.DateTimeField("created", auto_now_add=True)
+    
+    class Meta:
+        db_table = "chat"
     
     def chat(self):
         return Chat
@@ -119,6 +140,9 @@ class Order(models.Model):
     created_datetime = models.DateTimeField(auto_now_add=True)
     updated_datetime = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        db_table = "order"
+    
     def order(self):
         return Order
     
@@ -133,6 +157,9 @@ class Payment(models.Model):
     refund_datetime = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=15)
     
+    class Meta:
+        db_table = "payment"
+    
     def payment(self):
         return Payment
     
@@ -142,6 +169,9 @@ class Report(models.Model):
     customer_id = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     reason = models.TextField()
     created_datetime = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = "report"
     
     def report(self):
         return Report
@@ -153,6 +183,9 @@ class Wishlist(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     
+    class Meta:
+        db_table = "wishlist"
+    
     def wishlist(self):
         return Wishlist
     
@@ -161,6 +194,9 @@ class Withdrawal(models.Model):
     provider_id = models.ForeignKey(Provider, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=6, decimal_places=0)
     withdraw_datetime = models.DateTimeField()
+    
+    class Meta:
+        db_table = "withdrawal"
     
     def withdrawal(self):
         return Withdrawal
