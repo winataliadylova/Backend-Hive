@@ -1,14 +1,12 @@
-from django.shortcuts import render
+from rest_framework import generics, permissions 
+from rest_framework import viewsets
+from rest_framework.response import Response
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from .models import Car, Provider
+from .serializers import ProviderSerializer, CarSerializer 
 
 # Create your views here.
-
-customers = [
-    {'id': 1, 'name':'Daniel'},
-    {'id': 2, 'name':'Winata'},
-    {'id': 3, 'name':'Yohanes'},
-]
-
 
 def home(request):
     content = {'customers' : customers}
@@ -22,3 +20,19 @@ def customer(request, pk):
             
     context = {'customer' : customer}
     return render(request, 'base/customer.html', context)
+
+
+# REST API
+class ProviderViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows provider to be viewed or edited.
+    """
+    queryset = Provider.objects.all()
+    serializer_class = ProviderSerializer
+    
+class CarViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows car to be viewed or edited.
+    """
+    queryset = Car.objects.all()
+    serializer_class = CarSerializer

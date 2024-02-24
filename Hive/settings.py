@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'base.apps.BaseConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -79,14 +80,12 @@ WSGI_APPLICATION = 'Hive.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        # 'NAME': 'yrqkfzcd', 
-        # 'USER': 'yrqkfzcd', 
-        # 'PASSWORD': '3uq7MEi8VDCwQj_DSPz3-0jmLv8b8sOa',
-        # 'HOST': 'rosie.db.elephantsql.com',
-        # 'PORT': '5432',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'yrqkfzcd', 
+        'USER': 'yrqkfzcd', 
+        'PASSWORD': '3uq7MEi8VDCwQj_DSPz3-0jmLv8b8sOa',
+        'HOST': 'rosie.db.elephantsql.com',
+        'PORT': '5432',
     }
 }
 
