@@ -3,14 +3,15 @@ from django.http import HttpResponse
 from .forms import CustomerForm
 from .models import Customer
 
+from rest_framework import generics, permissions 
+from rest_framework import viewsets
+from rest_framework.response import Response
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from .models import Car, Provider
+from .serializers import ProviderSerializer, CarSerializer 
+
 # Create your views here.
-
-# customers = [
-#     {'id': 1, 'name':'Daniel'},
-#     {'id': 2, 'name':'Winata'},
-#     {'id': 3, 'name':'Yohanes'},
-# ]
-
 
 def home(request):
     customers = Customer.objects.all()
@@ -55,3 +56,17 @@ def deleteCustomer(request, pk):
         return redirect('home')
     
     return render(request, 'base/delete.html', {'obj': customer})
+# REST API
+class ProviderViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows provider to be viewed or edited.
+    """
+    queryset = Provider.objects.all()
+    serializer_class = ProviderSerializer
+    
+class CarViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows car to be viewed or edited.
+    """
+    queryset = Car.objects.all()
+    serializer_class = CarSerializer
