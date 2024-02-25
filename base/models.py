@@ -8,8 +8,8 @@ class Admin(models.Model):
     password = models.CharField(max_length=100)
     employee_id = models.CharField(max_length=20)
     name = models.CharField(max_length=100)
-    created = models.DateTimeField("created", auto_now_add=True)
-    updated = models.DateTimeField("updated", auto_now=True)
+    created_datetime = models.DateTimeField(auto_now_add=True)
+    updated_datetime = models.DateTimeField(auto_now=True)
    
     class Meta:
         db_table = "admin"
@@ -20,17 +20,17 @@ class Admin(models.Model):
  
 class Customer(models.Model):
     customer_id = models.BigAutoField(primary_key=True)
-    email = models.CharField("email", max_length=200)
-    name = models.CharField("name", max_length=200)
-    password = models.CharField("password", max_length=200)
-    id_card = models.CharField("idCard", max_length=200)
-    license_card = models.CharField("licenseCard", max_length=200)
-    phone_number = models.CharField("phoneNumber", max_length=200)
-    status = models.CharField("status", max_length=200)
-    created = models.DateTimeField("created", auto_now_add=True)
-    updated = models.DateTimeField("updated", auto_now=True)
-    #approvedBy
-    #approvedDate
+    email = models.CharField(max_length=200)
+    name = models.CharField(null=True, max_length=200)
+    password = models.CharField(max_length=200)
+    id_card = models.CharField(null=True, max_length=200)
+    license_card = models.CharField(null=True, max_length=200)
+    phone_number = models.CharField(null=True, max_length=200)
+    status = models.CharField(null=True, max_length=200)
+    created_datetime = models.DateTimeField(auto_now_add=True)
+    updated_datetime = models.DateTimeField(auto_now=True)
+    approved_by = models.ForeignKey(Admin, related_name="customers", on_delete=models.SET_NULL, null=True, db_column="approved_by")
+    approved_datetime = models.DateTimeField(null=True)
    
     class Meta:
         db_table = "customer"
@@ -53,11 +53,11 @@ class Provider(models.Model):
     id_card = models.CharField(max_length=50,null=True, blank=True)
     phone_number = models.CharField(max_length=20,null=True, blank=True)
     status = models.CharField(max_length=15,null=True, blank=True)
-    balance = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
+    balance = models.DecimalField(max_digits=10, decimal_places=0, default=0, null=True)
     created_datetime = models.DateTimeField(auto_now_add=True)
-    approved_datetime = models.DateTimeField(null=True, blank=True)
-    approved_by = models.ForeignKey(Admin, on_delete=models.SET_NULL, null=True, db_column="approved_by")
-    updated_datetime = models.DateTimeField(null=True)
+    approved_datetime = models.DateTimeField(null=True)
+    approved_by = models.ForeignKey(Admin, related_name="providers", on_delete=models.SET_NULL, null=True, db_column="approved_by")
+    updated_datetime = models.DateTimeField(auto_now=True)
    
     class Meta:
         db_table = "provider"
@@ -68,30 +68,34 @@ class Provider(models.Model):
  
 class Car(models.Model):
     car_id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="car_id")
-    provider_id = models.ForeignKey(Provider, on_delete=models.CASCADE, db_column="provider_id") #when Provider deleted all children will be deleted
+    provider = models.ForeignKey(Provider, related_name="cars", on_delete=models.CASCADE, db_column="provider_id") #when Provider deleted all children will be deleted
     brand = models.CharField(max_length=20)
+    car_type = models.CharField(max_length=20)
     year = models.CharField(max_length=4)
     color = models.CharField(max_length=20)
     seat = models.PositiveIntegerField()
     vehicle_no = models.CharField(max_length=15)
     transmission = models.CharField(max_length=10)
     price = models.DecimalField(max_digits=6, decimal_places=0)
-    deposit = models.DecimalField(max_digits=6, decimal_places=0, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-    status = models.CharField(max_length=15, null=True, blank=True)
+    deposit = models.DecimalField(max_digits=6, decimal_places=0, null=True)
+    description = models.TextField(null=True)
+    status = models.CharField(max_length=15, null=True, default="A")
+    rating = models.DecimalField(max_digits=2, decimal_places=1, default=0)
     created_datetime = models.DateTimeField(auto_now_add=True)
     updated_datetime = models.DateTimeField(auto_now=True)
-    # updated_by
+    updated_by = models.ForeignKey(Admin, related_name="cars", on_delete=models.SET_NULL, null=True, db_column="updated_by")
+
     class Meta:
         db_table = "car"
         managed = False
            
     def car(self):
         return Car
+    
 # one car have one or many car file
 class CarFile(models.Model):
     car_file_id = models.BigAutoField(primary_key=True)
-    car_id = models.ForeignKey(Car, on_delete=models.CASCADE, db_column="car_id") #when car deleted all children will be deleted
+    car_id = models.ForeignKey(Car, related_name="car_files", on_delete=models.CASCADE, db_column="car_id") #when car deleted all children will be deleted
     file_path = models.CharField(max_length=200)
     file_type = models.CharField(max_length=5)
     created_datetime = models.DateTimeField(auto_now_add=True)
@@ -105,22 +109,22 @@ class CarFile(models.Model):
  
 class ChatRoom(models.Model):
     chat_room_id = models.BigAutoField(primary_key=True)
-    provider_id = models.ForeignKey(Provider, on_delete=models.SET_NULL, null=True, db_column="provider_id")
-    customer_id = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, db_column="customer_id")
-   
+    provider = models.ForeignKey(Provider, related_name="chat_rooms", on_delete=models.SET_NULL, null=True, db_column="provider_id")
+    customer = models.ForeignKey(Customer, related_name="chat_rooms", on_delete=models.SET_NULL, null=True, db_column="customer_id")
+
     class Meta:
         db_table = "chat_room"
         managed = False
-   
+
     def chat_room(self):
         return ChatRoom
    
 class Chat(models.Model):
     chat_id = models.BigAutoField(primary_key=True)
-    chat_room_id = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, db_column="chat_room_id")
+    chat_room_id = models.ForeignKey(ChatRoom, related_name="chats", on_delete=models.CASCADE, db_column="chat_room_id")
     message = models.TextField()
-    file_path = models.CharField(max_length=200)
-    created = models.DateTimeField("created", auto_now_add=True)
+    file_path = models.CharField(max_length=200, null=True)
+    created_datetime = models.DateTimeField(auto_now_add=True)
    
     class Meta:
         db_table = "chat"
@@ -131,16 +135,16 @@ class Chat(models.Model):
  
 class Order(models.Model):
     order_id = models.BigAutoField(primary_key=True)
-    car_id = models.ForeignKey(Car, on_delete=models.SET_NULL, null=True, db_column="car_id")
-    customer_id = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, db_column="customer_id")
+    car = models.ForeignKey(Car, related_name="orders", on_delete=models.SET_NULL, null=True, db_column="car_id")
+    customer = models.ForeignKey(Customer, related_name="orders", on_delete=models.SET_NULL, null=True, db_column="customer_id")
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
     pickup_location = models.CharField(max_length=100)
     return_location = models.CharField(max_length=100)
     status = models.CharField(max_length=15)
-    transport_fee = models.DecimalField(max_digits=6, decimal_places=0, null=True, blank=True)
-    damage_fee = models.DecimalField(max_digits=6, decimal_places=0, null=True, blank=True)
-    late_fee = models.DecimalField(max_digits=6, decimal_places=0, null=True, blank=True)
+    transport_fee = models.DecimalField(max_digits=6, decimal_places=0, default=0)
+    damage_fee = models.DecimalField(max_digits=6, decimal_places=0, default=0)
+    late_fee = models.DecimalField(max_digits=6, decimal_places=0, default=0)
     review = models.TextField(null=True, blank=True)
     rating = models.PositiveIntegerField()
     created_datetime = models.DateTimeField(auto_now_add=True)
@@ -155,14 +159,14 @@ class Order(models.Model):
    
 class Payment(models.Model):
     payment_id = models.BigAutoField(primary_key=True)
-    order_id = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, db_column="order_id")
+    order_id = models.ForeignKey(Order, related_name="payments", on_delete=models.SET_NULL, null=True, db_column="order_id")
     invoice_no = models.CharField(max_length=100)
     payment_method = models.CharField(max_length=100)
-    amount = models.DecimalField(max_digits=6, decimal_places=0, null=True, blank=True)
-    transaction_datetime = models.DateTimeField()
-    deposit_return_time = models.DateTimeField(null=True, blank=True)
-    refund_datetime = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=15)
+    amount = models.DecimalField(max_digits=6, decimal_places=0, null=True)
+    transaction_datetime = models.DateTimeField(auto_now_add=True)
+    deposit_return_time = models.DateTimeField(null=True)
+    refund_datetime = models.DateTimeField(null=True)
+    status = models.CharField(max_length=15, default="IN")
    
     class Meta:
         db_table = "payment"
@@ -173,8 +177,8 @@ class Payment(models.Model):
    
 class Report(models.Model):
     report_id = models.BigAutoField(primary_key=True)
-    car_id = models.ForeignKey(Car, on_delete=models.CASCADE, db_column="car_id")
-    customer_id = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, db_column="customer_id")
+    car_id = models.ForeignKey(Car, related_name="reports", on_delete=models.CASCADE, db_column="car_id")
+    customer_id = models.ForeignKey(Customer, related_name="reports", on_delete=models.SET_NULL, null=True, db_column="customer_id")
     reason = models.TextField()
     created_datetime = models.DateTimeField(auto_now_add=True)
    
@@ -187,8 +191,8 @@ class Report(models.Model):
    
 class Wishlist(models.Model):
     wishlist_id = models.BigAutoField(primary_key=True)
-    car_id = models.ForeignKey(Car, on_delete=models.CASCADE, db_column="car_id")
-    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE, db_column="customer_id")
+    car = models.ForeignKey(Car, related_name="wishlists", on_delete=models.CASCADE, db_column="car_id")
+    customer_id = models.ForeignKey(Customer, related_name="wishlists", on_delete=models.CASCADE, db_column="customer_id")
     start_date = models.DateField()
     end_date = models.DateField()
    
@@ -201,9 +205,9 @@ class Wishlist(models.Model):
    
 class Withdrawal(models.Model):
     withdrawal_id = models.BigAutoField(primary_key=True)
-    provider_id = models.ForeignKey(Provider, on_delete=models.CASCADE, db_column="provider_id")
+    provider_id = models.ForeignKey(Provider, related_name="withdrawals", on_delete=models.CASCADE, db_column="provider_id")
     amount = models.DecimalField(max_digits=6, decimal_places=0)
-    withdraw_datetime = models.DateTimeField()
+    withdraw_datetime = models.DateTimeField(auto_now_add=True)
    
     class Meta:
         db_table = "withdrawal"
