@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 class Admin(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column="admin_id")
+    id = models.BigAutoField(primary_key=True)
     email = models.EmailField()
     password = models.CharField(max_length=100)
     employee_id = models.CharField(max_length=20)
@@ -19,7 +19,7 @@ class Admin(models.Model):
         return Admin
  
 class Customer(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column="customer_id")
+    id = models.BigAutoField(primary_key=True)
     email = models.CharField(max_length=200)
     name = models.CharField(null=True, max_length=200)
     password = models.CharField(max_length=200)
@@ -40,7 +40,7 @@ class Customer(models.Model):
         return Customer
  
 class Provider(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column="provider_id")
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=100,null=True, blank=True)
     trading_name = models.CharField(max_length=100,null=True, blank=True)
     email = models.EmailField()
@@ -67,7 +67,7 @@ class Provider(models.Model):
         return Provider
  
 class Car(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, db_column="car_id")
+    id = models.BigAutoField(auto_created=True, primary_key=True)
     provider = models.ForeignKey(Provider, related_name="cars", on_delete=models.CASCADE, db_column="provider_id") #when Provider deleted all children will be deleted
     brand = models.CharField(max_length=20)
     car_type = models.CharField(max_length=20)
@@ -94,7 +94,7 @@ class Car(models.Model):
     
 # one car have one or many car file
 class CarFile(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column="car_file_id")
+    id = models.BigAutoField(primary_key=True)
     car_id = models.ForeignKey(Car, related_name="car_files", on_delete=models.CASCADE, db_column="car_id") #when car deleted all children will be deleted
     file_path = models.CharField(max_length=200)
     file_type = models.CharField(max_length=5)
@@ -108,7 +108,7 @@ class CarFile(models.Model):
         return CarFile
  
 class ChatRoom(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column="chat_room_id")
+    id = models.BigAutoField(primary_key=True)
     provider = models.ForeignKey(Provider, related_name="chat_rooms", on_delete=models.SET_NULL, null=True, db_column="provider_id")
     customer = models.ForeignKey(Customer, related_name="chat_rooms", on_delete=models.SET_NULL, null=True, db_column="customer_id")
 
@@ -120,10 +120,11 @@ class ChatRoom(models.Model):
         return ChatRoom
    
 class Chat(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column="chat_id")
+    id = models.BigAutoField(primary_key=True)
     chat_room_id = models.ForeignKey(ChatRoom, related_name="chats", on_delete=models.CASCADE, db_column="chat_room_id")
     message = models.TextField()
     file_path = models.CharField(max_length=200, null=True)
+    is_read = models.BooleanField(default=False)
     created_datetime = models.DateTimeField(auto_now_add=True)
    
     class Meta:
@@ -134,7 +135,7 @@ class Chat(models.Model):
         return Chat
  
 class Order(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column="order_id")
+    id = models.BigAutoField(primary_key=True)
     car = models.ForeignKey(Car, related_name="orders", on_delete=models.SET_NULL, null=True, db_column="car_id")
     customer = models.ForeignKey(Customer, related_name="orders", on_delete=models.SET_NULL, null=True, db_column="customer_id")
     start_datetime = models.DateTimeField()
@@ -158,8 +159,8 @@ class Order(models.Model):
         return Order
    
 class Payment(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column="payment_id")
-    order_id = models.ForeignKey(Order, related_name="payments", on_delete=models.SET_NULL, null=True, db_column="order_id")
+    id = models.BigAutoField(primary_key=True)
+    order = models.ForeignKey(Order, related_name="payments", on_delete=models.SET_NULL, null=True, db_column="order_id")
     invoice_no = models.CharField(max_length=100)
     payment_method = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=6, decimal_places=0, null=True)
@@ -176,7 +177,7 @@ class Payment(models.Model):
         return Payment
    
 class Report(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column="report_id")
+    id = models.BigAutoField(primary_key=True)
     car_id = models.ForeignKey(Car, related_name="reports", on_delete=models.CASCADE, db_column="car_id")
     customer_id = models.ForeignKey(Customer, related_name="reports", on_delete=models.SET_NULL, null=True, db_column="customer_id")
     reason = models.TextField()
@@ -190,7 +191,7 @@ class Report(models.Model):
         return Report
    
 class Wishlist(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column="wishlist_id")
+    id = models.BigAutoField(primary_key=True)
     car = models.ForeignKey(Car, related_name="wishlists", on_delete=models.CASCADE, db_column="car_id")
     customer_id = models.ForeignKey(Customer, related_name="wishlists", on_delete=models.CASCADE, db_column="customer_id")
     start_date = models.DateField()
@@ -204,7 +205,7 @@ class Wishlist(models.Model):
         return Wishlist
    
 class Withdrawal(models.Model):
-    id = models.BigAutoField(primary_key=True, db_column="withdrawal_id")
+    id = models.BigAutoField(primary_key=True)
     provider_id = models.ForeignKey(Provider, related_name="withdrawals", on_delete=models.CASCADE, db_column="provider_id")
     amount = models.DecimalField(max_digits=6, decimal_places=0)
     withdraw_datetime = models.DateTimeField(auto_now_add=True)
