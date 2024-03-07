@@ -2,6 +2,8 @@ from django.urls import include, path
 from rest_framework import routers
 from rest_framework.schemas import get_schema_view
 
+from django.views.decorators.csrf import csrf_exempt
+
 from . import views
 
 router = routers.DefaultRouter()
@@ -23,7 +25,15 @@ urlpatterns = [
     path('api/', include('rest_framework.urls', namespace="rest_framework")),
     path('schema/', get_schema_view()),
     path('<str:user>/check-email', views.is_email_exists),
+    
+    path('admin/user-approval', views.admin_approval_user),
+    
     path('customer/login', views.customer_login),
+    
+    path('provider/proceed-order', views.provider_proceed_order),
+    path('provider/complete-rent', views.provider_complete_rent),
+    # path('provider/input-fee', csrf_exempt(views.provider_input_fee)),
+    path('provider/input-fee', views.provider_input_fee),
 ]
 
 urlpatterns += router.urls
