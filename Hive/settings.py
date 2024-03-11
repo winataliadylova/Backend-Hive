@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'base.apps.BaseConfig',
     'rest_framework',
     'corsheaders',
+    'daphne',
 ]
 
 MIDDLEWARE = [
@@ -76,7 +77,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Hive.wsgi.application'
+# untuk websocket
+ASGI_APPLICATION = 'Hive.asgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

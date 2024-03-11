@@ -78,6 +78,7 @@ class Car(models.Model):
     transmission = models.CharField(max_length=10)
     price = models.DecimalField(max_digits=6, decimal_places=0)
     deposit = models.DecimalField(max_digits=6, decimal_places=0, null=True)
+    fuel = models.CharField(max_length=10)
     description = models.TextField(null=True)
     status = models.CharField(max_length=15, null=True, default="A")
     rating = models.DecimalField(max_digits=2, decimal_places=1, default=0)
