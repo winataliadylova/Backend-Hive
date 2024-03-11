@@ -29,7 +29,9 @@ urlpatterns = [
     
     path('customer/login', views.customer_login),
     path('customer/check-schedule', views.customer_check_order_schedule),
-    path('customer/dropdown-location', views.customer_dropdown_location)
+    path('customer/dropdown-location', views.customer_dropdown_location),
+
+    path('provider/login', views.provider_login)
 ]
 
 urlpatterns += router.urls

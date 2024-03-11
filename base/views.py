@@ -15,6 +15,7 @@ import json
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    
 class ProviderViewSet(viewsets.ModelViewSet):
     queryset = Provider.objects.all()
     serializer_class = ProviderSerializer
@@ -118,6 +119,23 @@ def customer_login (request):
             "customer": CustomerSerializer(customer[0]).data,
             "provider": ProviderSerializer(provider[0]).data if provider else None
         })
+    
+### API for provider login
+@api_view(['POST'])
+def provider_login (request):
+    email = request.data['email']
+    password = request.data['password']
+    
+    with connection.cursor() as cursor:
+        cursor.execute('SELECT * FROM provider WHERE email = %s AND password = %s', [email, password])
+        provider = dictfetchall(cursor)
+    
+    if not provider :
+        # return unauthorized if customer not found
+        return Response(None, 401)
+    else :
+        return Response(ProviderSerializer(provider[0]).data)
+    
 
 ### API for approval user masih error csrf token
 @api_view(['POST'])
