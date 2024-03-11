@@ -216,3 +216,18 @@ class Withdrawal(models.Model):
    
     def withdrawal(self):
         return Withdrawal
+    
+class Notification(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    isread = models.CharField(max_length=15)
+    user_id = models.BigIntegerField()
+    type = models.CharField(max_length=30)
+    message = models.TextField()
+    created_datetime = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = "notification"
+        managed = False
+   
+    def notification(self):
+        return Notification
