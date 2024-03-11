@@ -4,10 +4,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.db import connection
 from .models import *
 from .serializers import *
+import json
 
 # Create your views here.
 
@@ -57,6 +58,10 @@ class ChatViewSet(viewsets.ModelViewSet):
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
     serializer_class = ReportSerializer
+    
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
 
 
 ### Helper function
@@ -114,19 +119,6 @@ def customer_login (request):
             "provider": ProviderSerializer(provider[0]).data if provider else None
         })
 
-### API for proceed order status 1 order approved
-@api_view(['POST'])
-def provider_proceed_order (request):
-    id = request.data['id']
-    status = request.data['status']
-    
-    with connection.cursor() as cursor:
-        cursor.execute('UPDATE public.order SET status = %s WHERE id = %s', [status, id])
-        cursor.execute('SELECT * FROM public.order WHERE id = %s', [id])
-        order = dictfetchall(cursor)
-        
-        return Response(order)
-
 ### API for approval user masih error csrf token
 @api_view(['POST'])
 # @csrf_exempt
@@ -146,57 +138,93 @@ def admin_approval_user (request):
             user = dictfetchall(cursor)
         
         return Response(user)
-    
-### API for complete rent status 2 complete rent
-@api_view(['POST'])
-def provider_complete_rent (request):
-    id = request.data['id']
-    status = request.data['status']
-    
-    with connection.cursor() as cursor:
-        cursor.execute('UPDATE public.order SET status = %s WHERE id = %s', [status, id])
-        cursor.execute('SELECT * FROM public.order WHERE id = %s', [id])
-        order = dictfetchall(cursor)
-        
-        return Response(order)
 
-# SELECT COUNT(*) FROM order 
-# WHERE start_date BETWEEN @startDate AND @endDate
-# OR end_date BETWEEN @startDate AND @endDate
-
+### API for customer filter + search car
 @api_view(['POST'])
 def customer_check_order_schedule (request):
-    id = request.data['id']
     start_date = request.data['start_date']
     end_date = request.data['end_date']
+    province = request.data['province'].lower()
+    city = request.data['city'].lower()
+    start_price = request.data['start_price']
+    end_price = request.data['end_price']
+    car_type = request.data['car_type']
+    start_year = request.data['start_year']
+    end_year = request.data['end_year']
+    seat = request.data['seat']
+    transmission = request.data['transmission']
+    
+    query = "SELECT * FROM public.car WHERE provider_id IN (SELECT id FROM provider WHERE LOWER(province) = %s AND LOWER(city) = %s) AND id NOT IN (SELECT car_id FROM public.order WHERE status < %s AND (start_datetime BETWEEN %s AND %s OR end_datetime BETWEEN %s AND %s))"
+    
+    variable = [province, city, '4',start_date, end_date, start_date, end_date]
+    
+    if start_price is not None:
+        temp = " AND price BETWEEN %s AND %s"
+        query = query + temp
+        variable.append(start_price)
+        variable.append(end_price)
+        
+    if car_type is not None:
+        temp = " AND car_type IN ("
+        for item in car_type:
+            if car_type.index(item) == len(car_type) - 1:
+                print(item, end='')
+                temp = temp + "%s)"
+            else:
+                print(item, end=', ')
+                temp = temp + "%s,"
+                print(temp)
+            variable.append(item)
+        query = query + temp
+        print(query)
+        print(variable)
+        
+    if start_year is not None:
+        temp = " AND year BETWEEN %s AND %s"
+        query = query + temp
+        variable.append(start_year)
+        variable.append(end_year)
+        
+    if seat is not None:
+        temp = " AND seat IN ("
+        for item in seat:
+            if seat.index(item) == len(seat) - 1:
+                print(item, end='')
+                temp = temp + "%s)"
+            else:
+                print(item, end=', ')
+                temp = temp + "%s,"
+                print(temp)
+            variable.append(item)
+        query = query + temp
+        print(query)
+        print(variable)
+    if transmission is not None:
+        temp = " AND transmission IN ("
+        for item in transmission:
+            if transmission.index(item) == len(transmission) - 1:
+                print(item, end='')
+                temp = temp + "%s)"
+            else:
+                print(item, end=', ')
+                temp = temp + "%s,"
+                print(temp)
+            variable.append(item)
+        query = query + temp
+        print(query)
+        print(variable)
     
     with connection.cursor() as cursor:
-        cursor.execute('SELECT * FROM public.order WHERE id = %s', [id])
+        cursor.execute(query, variable)
         order = dictfetchall(cursor)
         
         return Response(order)
     
-### API for complete rent status 3 pending fee payment masih error csrf token
-@api_view(['POST'])
-# @csrf_exempt
-def provider_input_fee(request):
-    id = request.data['id']
-    status = request.data['status']
-    damage_fee = request.data['damage_fee']
-    late_fee = request.data['late_fee']
-    
-    if status == "3":
-        # Order.objects.filter(id=id).update(status=status, damage_fee=damage_fee, late_fee=late_fee)
-        with connection.cursor() as cursor:
-            cursor.execute('UPDATE public.order SET status = %s, damage_fee = %s, late_fee = %s  WHERE id = %s', [status, damage_fee, late_fee, id])
-            # User.objects.filter(id=data['id']).update(email=data['email'], phone=data['phone'])
-            cursor.execute('SELECT * FROM public.order WHERE id = %s', [id])
-            order = dictfetchall(cursor)
-            
-    else:
-        with connection.cursor() as cursor:
-            cursor.execute('UPDATE public.order SET status = %s WHERE id = %s', [status, id])
-            cursor.execute('SELECT * FROM public.order WHERE id = %s', [id])
-            order = dictfetchall(cursor)
-            
-    return Response(order)
+### API for customer_dropdown_location
+@api_view(['GET'])
+def customer_dropdown_location (request):
+    with connection.cursor() as cursor:
+        cursor.execute('SELECT DISTINCT CONCAT(city, %s ,province) AS location FROM provider ', [', '])
+        location = json.loads(json.dumps(cursor.fetchall()))
+        location = [item for sublist in location for item in sublist]
+        return Response(location)

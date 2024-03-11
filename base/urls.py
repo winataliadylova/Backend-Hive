@@ -2,8 +2,6 @@ from django.urls import include, path
 from rest_framework import routers
 from rest_framework.schemas import get_schema_view
 
-from django.views.decorators.csrf import csrf_exempt
-
 from . import views
 
 router = routers.DefaultRouter()
@@ -19,6 +17,7 @@ router.register(r'withdrawals', views.PaymentViewSet)
 router.register(r'chat-rooms', views.ChatRoomViewSet)
 router.register(r'chats', views.ChatViewSet)
 router.register(r'reports', views.ReportViewSet)
+router.register(r'notifications', views.NotificationViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -29,11 +28,8 @@ urlpatterns = [
     path('admin/user-approval', views.admin_approval_user),
     
     path('customer/login', views.customer_login),
-    
-    path('provider/proceed-order', views.provider_proceed_order),
-    path('provider/complete-rent', views.provider_complete_rent),
-    # path('provider/input-fee', csrf_exempt(views.provider_input_fee)),
-    path('provider/input-fee', views.provider_input_fee),
+    path('customer/check-schedule', views.customer_check_order_schedule),
+    path('customer/dropdown-location', views.customer_dropdown_location)
 ]
 
 urlpatterns += router.urls
