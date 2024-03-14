@@ -19,12 +19,12 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def send_notification(self, event):
         # print("type: ", type(event['message']))
-        # notif = event['message']
+        notif = event['message']
         # print(notif)
-        # notif = json.loads(notif)
-        # notif = notif[0]
+        notif = json.loads(notif)
+        notif = notif[0]
         # print("type: ", type(notif))
         # # print()
         # print(json.dumps(notif['fields']))
-        await self.send(text_data=json.dumps({ 'message': event['message'] }))
-        # await self.send(text_data=json.dumps({ 'message': temp }))
+        # await self.send(text_data=json.dumps({ 'message': event['message'] }))
+        await self.send(text_data=json.dumps({ 'message': notif }))
