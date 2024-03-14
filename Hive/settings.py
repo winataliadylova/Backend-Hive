@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    
+    'daphne',
+    
     'django.contrib.staticfiles',
     
     'base.apps.BaseConfig',
@@ -76,7 +79,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Hive.wsgi.application'
+# untuk websocket
+ASGI_APPLICATION = 'Hive.asgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

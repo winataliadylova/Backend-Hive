@@ -171,10 +171,11 @@ def customer_check_order_schedule (request):
     end_year = request.data['end_year']
     seat = request.data['seat']
     transmission = request.data['transmission']
+    fuel = request.data['fuel']
     
-    query = "SELECT * FROM public.car WHERE provider_id IN (SELECT id FROM provider WHERE LOWER(province) = %s AND LOWER(city) = %s) AND id NOT IN (SELECT car_id FROM public.order WHERE status < %s AND (start_datetime BETWEEN %s AND %s OR end_datetime BETWEEN %s AND %s))"
+    query = "SELECT * FROM public.car WHERE isdelete = %s AND provider_id IN (SELECT id FROM provider WHERE LOWER(province) = %s AND LOWER(city) = %s) AND id NOT IN (SELECT car_id FROM public.order WHERE status < %s AND (start_datetime BETWEEN %s AND %s OR end_datetime BETWEEN %s AND %s))"
     
-    variable = [province, city, '4',start_date, end_date, start_date, end_date]
+    variable = ['0', province, city, '4',start_date, end_date, start_date, end_date]
     
     if start_price is not None:
         temp = " AND price BETWEEN %s AND %s"
@@ -217,10 +218,26 @@ def customer_check_order_schedule (request):
         query = query + temp
         print(query)
         print(variable)
+        
     if transmission is not None:
         temp = " AND transmission IN ("
         for item in transmission:
             if transmission.index(item) == len(transmission) - 1:
+                print(item, end='')
+                temp = temp + "%s)"
+            else:
+                print(item, end=', ')
+                temp = temp + "%s,"
+                print(temp)
+            variable.append(item)
+        query = query + temp
+        print(query)
+        print(variable)
+        
+    if fuel is not None:
+        temp = " AND fuel IN ("
+        for item in fuel:
+            if fuel.index(item) == len(fuel) - 1:
                 print(item, end='')
                 temp = temp + "%s)"
             else:
@@ -246,3 +263,6 @@ def customer_dropdown_location (request):
         location = json.loads(json.dumps(cursor.fetchall()))
         location = [item for sublist in location for item in sublist]
         return Response(location)
+    
+def test_notif(request):
+    return render(request, 'notif_index.html')
