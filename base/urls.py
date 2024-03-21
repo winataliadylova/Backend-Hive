@@ -29,7 +29,7 @@ urlpatterns = [
     path('customer/login', views.customer_login),
     path('customer/check-schedule', views.customer_check_order_schedule),
     path('customer/dropdown-location', views.customer_dropdown_location),
-    path('notif', views.test_notif, name='test_notif')
+    path('notif', views.test_notif, name='test_notif'),
 
     path('provider/login', views.provider_login)
 ]
