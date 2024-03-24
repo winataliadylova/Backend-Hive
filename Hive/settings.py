@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     
     'base.apps.BaseConfig',
     'rest_framework',
-    
+    'corsheaders',
 ]
 
 ASGI_APPLICATION = 'Hive.asgi.application'
@@ -64,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'Hive.urls'

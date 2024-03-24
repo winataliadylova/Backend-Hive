@@ -24,8 +24,14 @@ class ProviderViewSet(viewsets.ModelViewSet):
     serializer_class = ProviderSerializer
     
 class CarViewSet(viewsets.ModelViewSet):
-    queryset = Car.objects.all()
     serializer_class = CarSerializer
+    
+    def get_queryset(self):
+        queryset = Car.objects.all()
+        provider = self.request.query_params.get('provider_id')
+        if provider is not None:
+            queryset = queryset.filter(provider_id = provider)
+        return queryset
 
 class CarFilesViewSet(viewsets.ModelViewSet):
     queryset = CarFile.objects.all()
@@ -36,16 +42,33 @@ class AdminViewSet(viewsets.ModelViewSet):
     serializer_class = AdminSerializer
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    
+    def get_queryset(self):
+        queryset = Order.objects.all()
+        customer = self.request.query_params.get('customer_id')
+        if customer is not None:
+            queryset = queryset.filter(customer_id = customer)
+        
+        provider = self.request.query_params.get('provider_id')
+        if provider is not None:
+            queryset = queryset.filter(provider_id = provider)
+        return queryset
+    
 
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
 
 class WishlistViewSet(viewsets.ModelViewSet):
-    queryset = Wishlist.objects.all()
     serializer_class = WishlistSerializer
+    
+    def get_queryset(self):
+        queryset = Wishlist.objects.all()
+        customer = self.request.query_params.get('customer_id')
+        if customer is not None:
+            queryset = queryset.filter(customer_id = customer)
+        return queryset
 
 class WithdrawalViewSet(viewsets.ModelViewSet):
     queryset = Withdrawal.objects.all()
@@ -166,90 +189,90 @@ def customer_check_order_schedule (request):
     end_date = request.data['end_date']
     province = request.data['province'].lower()
     city = request.data['city'].lower()
-    start_price = request.data['start_price']
-    end_price = request.data['end_price']
-    car_type = request.data['car_type']
-    start_year = request.data['start_year']
-    end_year = request.data['end_year']
-    seat = request.data['seat']
-    transmission = request.data['transmission']
-    fuel = request.data['fuel']
+    # start_price = request.data['start_price']
+    # end_price = request.data['end_price']
+    # car_type = request.data['car_type']
+    # start_year = request.data['start_year']
+    # end_year = request.data['end_year']
+    # seat = request.data['seat']
+    # transmission = request.data['transmission']
+    # fuel = request.data['fuel']
     
     query = "SELECT * FROM public.car WHERE isdelete = %s AND provider_id IN (SELECT id FROM provider WHERE LOWER(province) = %s AND LOWER(city) = %s) AND id NOT IN (SELECT car_id FROM public.order WHERE status < %s AND (start_datetime BETWEEN %s AND %s OR end_datetime BETWEEN %s AND %s))"
     
-    variable = ['0', province, city, '4',start_date, end_date, start_date, end_date]
+    variable = ['0', province, city, '5',start_date, end_date, start_date, end_date]
     
-    if start_price is not None:
-        temp = " AND price BETWEEN %s AND %s"
-        query = query + temp
-        variable.append(start_price)
-        variable.append(end_price)
+    # if start_price is not None:
+    #     temp = " AND price BETWEEN %s AND %s"
+    #     query = query + temp
+    #     variable.append(start_price)
+    #     variable.append(end_price)
         
-    if car_type is not None:
-        temp = " AND car_type IN ("
-        for item in car_type:
-            if car_type.index(item) == len(car_type) - 1:
-                print(item, end='')
-                temp = temp + "%s)"
-            else:
-                print(item, end=', ')
-                temp = temp + "%s,"
-                print(temp)
-            variable.append(item)
-        query = query + temp
-        print(query)
-        print(variable)
+    # if car_type is not None:
+    #     temp = " AND car_type IN ("
+    #     for item in car_type:
+    #         if car_type.index(item) == len(car_type) - 1:
+    #             print(item, end='')
+    #             temp = temp + "%s)"
+    #         else:
+    #             print(item, end=', ')
+    #             temp = temp + "%s,"
+    #             print(temp)
+    #         variable.append(item)
+    #     query = query + temp
+    #     print(query)
+    #     print(variable)
         
-    if start_year is not None:
-        temp = " AND year BETWEEN %s AND %s"
-        query = query + temp
-        variable.append(start_year)
-        variable.append(end_year)
+    # if start_year is not None:
+    #     temp = " AND year BETWEEN %s AND %s"
+    #     query = query + temp
+    #     variable.append(start_year)
+    #     variable.append(end_year)
         
-    if seat is not None:
-        temp = " AND seat IN ("
-        for item in seat:
-            if seat.index(item) == len(seat) - 1:
-                print(item, end='')
-                temp = temp + "%s)"
-            else:
-                print(item, end=', ')
-                temp = temp + "%s,"
-                print(temp)
-            variable.append(item)
-        query = query + temp
-        print(query)
-        print(variable)
+    # if seat is not None:
+    #     temp = " AND seat IN ("
+    #     for item in seat:
+    #         if seat.index(item) == len(seat) - 1:
+    #             print(item, end='')
+    #             temp = temp + "%s)"
+    #         else:
+    #             print(item, end=', ')
+    #             temp = temp + "%s,"
+    #             print(temp)
+    #         variable.append(item)
+    #     query = query + temp
+    #     print(query)
+    #     print(variable)
         
-    if transmission is not None:
-        temp = " AND transmission IN ("
-        for item in transmission:
-            if transmission.index(item) == len(transmission) - 1:
-                print(item, end='')
-                temp = temp + "%s)"
-            else:
-                print(item, end=', ')
-                temp = temp + "%s,"
-                print(temp)
-            variable.append(item)
-        query = query + temp
-        print(query)
-        print(variable)
+    # if transmission is not None:
+    #     temp = " AND transmission IN ("
+    #     for item in transmission:
+    #         if transmission.index(item) == len(transmission) - 1:
+    #             print(item, end='')
+    #             temp = temp + "%s)"
+    #         else:
+    #             print(item, end=', ')
+    #             temp = temp + "%s,"
+    #             print(temp)
+    #         variable.append(item)
+    #     query = query + temp
+    #     print(query)
+    #     print(variable)
         
-    if fuel is not None:
-        temp = " AND fuel IN ("
-        for item in fuel:
-            if fuel.index(item) == len(fuel) - 1:
-                print(item, end='')
-                temp = temp + "%s)"
-            else:
-                print(item, end=', ')
-                temp = temp + "%s,"
-                print(temp)
-            variable.append(item)
-        query = query + temp
-        print(query)
-        print(variable)
+    # if fuel is not None:
+    #     temp = " AND fuel IN ("
+    #     for item in fuel:
+    #         if fuel.index(item) == len(fuel) - 1:
+    #             print(item, end='')
+    #             temp = temp + "%s)"
+    #         else:
+    #             print(item, end=', ')
+    #             temp = temp + "%s,"
+    #             print(temp)
+    #         variable.append(item)m
+    #     query = query + temp
+    #     print(query)
+    #     print(variable)
     
     with connection.cursor() as cursor:
         cursor.execute(query, variable)
@@ -265,6 +288,23 @@ def customer_dropdown_location (request):
         location = json.loads(json.dumps(cursor.fetchall()))
         location = [item for sublist in location for item in sublist]
         return Response(location)
+
+### API for rating order and calc rating in car
+@api_view(['POST'])
+def rate_order(request):
+    id = request.data['id']
+    rating = request.data['rating']
+    order = Order.objects.get(id=id)
+    order.rating = rating
+    order.save()
+    print('order', order)
+    
+    car = Car.objects.get(id=order.car.id)
+    car.rating = (car.rating * car.order_count + rating) / (car.order_count + 1)
+    car.order_count += 1
+    car.save()
+    print('car', car)
+    return Response(OrderSerializer(Order.objects.get(id=id)).data)
     
 def test_notif(request, room_name):
     return render(request, 'notif_index.html', {

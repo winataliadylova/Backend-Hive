@@ -10,12 +10,6 @@ class CustomerSerializer(serializers.ModelSerializer):
         }
 
 class ProviderSerializer(serializers.ModelSerializer):
-    # def create(self, validated_data):
-    #     print(validated_data)
-    #     with connection.cursor() as cursor:
-    #         cursor.execute('CALL insert_user_provider(%s, %s)', [validated_data['email'], validated_data['password']])
-    #         return self
-    
     class Meta:
         model = Provider
         fields = '__all__'
@@ -47,10 +41,17 @@ class AdminSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
+        
+class PaymentSerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = Payment
+        fields = '__all__'
 
 class OrderSerializer(serializers.ModelSerializer):
     car = CarSerializer(read_only=True)
     customer = CustomerSerializer(read_only=True)
+    queryset = Order.objects.prefetch_related('payments')
+    payments = PaymentSerializer(queryset, many=True, read_only=True)
     
     car_id = serializers.PrimaryKeyRelatedField(
         queryset=Car.objects.all(), source='car', write_only=True)
@@ -59,12 +60,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = '__all__'
-
-class PaymentSerializer(serializers.ModelSerializer):
-    order = OrderSerializer(read_only=True)
-    class Meta:
-        model = Payment
         fields = '__all__'
 
 class WishlistSerializer(serializers.ModelSerializer):
