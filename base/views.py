@@ -62,6 +62,10 @@ class ChatViewSet(viewsets.ModelViewSet):
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
     serializer_class = ReportSerializer
+    
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
 
 ### Helper function
 def dictfetchall(cursor):

@@ -28,6 +28,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         # # print()
         # print(json.dumps(notif['fields']))
         # await self.send(text_data=json.dumps({ 'message': event['message'] }))
+        await self.send(text_data=json.dumps({ 'message': notif }))
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -52,9 +53,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def chatroom_message(self, event):
         message = event['message']
-
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
-
+        chat = json.loads(message)
+        chat = chat[0]
+        await self.send(text_data=json.dumps({ 'message': chat }))
     pass
