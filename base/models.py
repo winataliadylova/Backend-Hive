@@ -111,7 +111,7 @@ class CarFile(models.Model):
            
     def car_file(self):
         return CarFile
- 
+
 class ChatRoom(models.Model):
     id = models.BigAutoField(primary_key=True)
     provider = models.ForeignKey(Provider, related_name="chat_rooms", on_delete=models.SET_NULL, null=True, db_column="provider_id")
@@ -123,10 +123,12 @@ class ChatRoom(models.Model):
 
     def chat_room(self):
         return ChatRoom
-   
+
 class Chat(models.Model):
     id = models.BigAutoField(primary_key=True)
-    chat_room_id = models.ForeignKey(ChatRoom, related_name="chats", on_delete=models.CASCADE, db_column="chat_room_id")
+    chat_room_id = models.ForeignKey(ChatRoom, related_name="chat", on_delete=models.CASCADE, db_column="chat_room_id")
+    sender = models.CharField(max_length=200)
+    receiver = models.CharField(max_length=200)
     message = models.TextField()
     file_path = models.CharField(max_length=200, null=True)
     is_read = models.BooleanField(default=False)
@@ -136,8 +138,8 @@ class Chat(models.Model):
         db_table = "chat"
         managed = False
    
-    def chat(self):
-        return Chat
+    def __str__(self):
+        return f"{self.sender} - {self.receiver}"
  
 class Order(models.Model):
     id = models.BigAutoField(primary_key=True)

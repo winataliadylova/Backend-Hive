@@ -3,9 +3,12 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.parsers import JSONParser
+from django.http.response import JsonResponse
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.db import connection
+from django.db.models import Subquery, OuterRef, Q
 from .models import *
 from .serializers import *
 import json
@@ -47,11 +50,11 @@ class WishlistViewSet(viewsets.ModelViewSet):
 class WithdrawalViewSet(viewsets.ModelViewSet):
     queryset = Withdrawal.objects.all()
     serializer_class = WithdrawalSerializer
-
+    
 class ChatRoomViewSet(viewsets.ModelViewSet):
     queryset = ChatRoom.objects.all()
     serializer_class = ChatRoomSerializer
-
+        
 class ChatViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
@@ -63,7 +66,6 @@ class ReportViewSet(viewsets.ModelViewSet):
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
-
 
 ### Helper function
 def dictfetchall(cursor):
@@ -119,7 +121,7 @@ def customer_login (request):
             "customer": CustomerSerializer(customer[0]).data,
             "provider": ProviderSerializer(provider[0]).data if provider else None
         })
-    
+
 ### API for provider login
 @api_view(['POST'])
 def provider_login (request):
@@ -267,4 +269,9 @@ def customer_dropdown_location (request):
 def test_notif(request, room_name):
     return render(request, 'notif_index.html', {
         'room_name': room_name
+    })
+
+def room(request, room_name):
+    return render(request, 'chat/chatroom.html', {
+        'room_name' : room_name
     })

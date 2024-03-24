@@ -1,6 +1,11 @@
-from django.urls import re_path
-from base import consumers
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
+import base.routing
 
-websocket_urlpatterns = [
-    re_path(r"ws/notify/(?P<room_name>\w+)/$", consumers.NotificationConsumer.as_asgi()),
-]
+application = ProtocolTypeRouter({
+    'websocket': AuthMiddlewareStack(
+        URLRouter(
+            base.routing.websocket_urlpatterns
+        )
+    ),
+})

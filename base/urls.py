@@ -31,7 +31,8 @@ urlpatterns = [
     path('customer/dropdown-location', views.customer_dropdown_location),
     path('notif/<str:room_name>/', views.test_notif, name='test_notif'),
 
-    path('provider/login', views.provider_login)
+    path('provider/login', views.provider_login),
+    path('chat/<str:room_name>/', views.room, name='room')
 ]
 
 urlpatterns += router.urls
