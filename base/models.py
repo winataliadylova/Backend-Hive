@@ -25,6 +25,7 @@ class Customer(models.Model):
     password = models.CharField(max_length=200)
     id_card = models.CharField(null=True, max_length=200)
     license_card = models.CharField(null=True, max_length=200)
+    profile_picture = models.CharField(null=True, max_length=200)
     phone_number = models.CharField(null=True, max_length=200)
     status = models.CharField(null=True, max_length=200)
     created_datetime = models.DateTimeField(auto_now_add=True)
@@ -51,6 +52,7 @@ class Provider(models.Model):
     bank_account_number = models.CharField(max_length=50,null=True, blank=True)
     bank_account_name = models.CharField(max_length=50,null=True, blank=True)
     id_card = models.CharField(max_length=50,null=True, blank=True)
+    profile_picture = models.CharField(null=True, max_length=200)
     phone_number = models.CharField(max_length=20,null=True, blank=True)
     status = models.CharField(max_length=15,null=True, blank=True)
     balance = models.DecimalField(max_digits=10, decimal_places=0, default=0, null=True)
@@ -74,12 +76,15 @@ class Car(models.Model):
     year = models.CharField(max_length=4)
     color = models.CharField(max_length=20)
     seat = models.PositiveIntegerField()
+    count = models.PositiveIntegerField()
     vehicle_no = models.CharField(max_length=15)
     transmission = models.CharField(max_length=10)
     price = models.DecimalField(max_digits=6, decimal_places=0)
     deposit = models.DecimalField(max_digits=6, decimal_places=0, null=True)
+    fuel = models.CharField(max_length=10)
     description = models.TextField(null=True)
     status = models.CharField(max_length=15, null=True, default="A")
+    isdelete = models.CharField(max_length=15, null=True, default="0")
     rating = models.DecimalField(max_digits=2, decimal_places=1, default=0)
     created_datetime = models.DateTimeField(auto_now_add=True)
     updated_datetime = models.DateTimeField(auto_now=True)
@@ -218,3 +223,18 @@ class Withdrawal(models.Model):
    
     def withdrawal(self):
         return Withdrawal
+    
+class Notification(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    isread = models.CharField(max_length=15)
+    user_id = models.BigIntegerField()
+    type = models.CharField(max_length=30)
+    message = models.TextField()
+    created_datetime = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = "notification"
+        managed = False
+   
+    def notification(self):
+        return Notification
