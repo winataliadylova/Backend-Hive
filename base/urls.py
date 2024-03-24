@@ -12,7 +12,7 @@ router.register(r'admins', views.AdminViewSet)
 router.register(r'orders', views.OrderViewSet)
 router.register(r'payments', views.PaymentViewSet)
 router.register(r'wishlists', views.WishlistViewSet)
-router.register(r'withdrawals', views.PaymentViewSet)
+router.register(r'withdrawals', views.WithdrawalViewSet)
 router.register(r'chat-rooms', views.ChatRoomViewSet)
 router.register(r'chats', views.ChatViewSet)
 router.register(r'reports', views.ReportViewSet)
@@ -29,7 +29,7 @@ urlpatterns = [
     path('customer/login', views.customer_login),
     path('customer/check-schedule', views.customer_check_order_schedule),
     path('customer/dropdown-location', views.customer_dropdown_location),
-    path('notif', views.test_notif, name='test_notif')
+    path('notif/<str:room_name>/', views.test_notif, name='test_notif'),
 
     path('provider/login', views.provider_login)
     path('chat/<str:room_name>/', views.room, name='room')

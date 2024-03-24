@@ -31,12 +31,16 @@
 {% endblock %}
 
 {% block js_script %}
+{{room_name|json_script:"room_name"}}
 <script>
+    const room_name = JSON.parse(document.getElementById('room_name').textContent);
     // setup chat scoket
     const notifyScoket = new WebSocket(
         'ws://'
         + window.location.host
         + '/ws/notify/'
+        + room_name
+        + '/'
     );
 
     // on socket open
@@ -55,7 +59,10 @@
         const message = data.message;
         // Call the setMessage function to add the new li element
         setMessage(message);
-
+        
+        console.log("message notif: ");
+        console.log(message);
+        console.log("end")
     };
 
     function setMessage(message) {

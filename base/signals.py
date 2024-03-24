@@ -22,8 +22,10 @@ def notification_created(sender, instance, created, **kwargs):
         # print(notif[0])
         channel_layer = get_channel_layer()
         # print(instance)
+        room_name = (notif['fields']['type'] + "_" + str(notif['fields']['user_id']))
+        print("room_name: " + room_name)
         async_to_sync(channel_layer.group_send)(
-            'public_room',
+            room_name,
             {
                 "type": "send_notification",
                 "message": serializers.serialize('json', [instance])

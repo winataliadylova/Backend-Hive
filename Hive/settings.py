@@ -26,6 +26,7 @@ SECRET_KEY = 'django-insecure-rgupknc(y2oqs29h$cx54q%m+ejslb%978(xfrw0e9_hbw$+r6
 DEBUG = True
 
 ALLOWED_HOSTS=['*']
+# ALLOWED_HOSTS=['hivebe.my.id']
 CORS_ORIGIN_ALLOW_ALL = True
 
 
@@ -145,6 +146,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+# STATIC_URL = '/'
+# STATIC_ROOT= '/home/hivebemy/hive_backend/hive/public/'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

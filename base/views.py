@@ -262,8 +262,10 @@ def customer_dropdown_location (request):
         location = [item for sublist in location for item in sublist]
         return Response(location)
     
-def test_notif(request):
-    return render(request, 'notif_index.html')
+def test_notif(request, room_name):
+    return render(request, 'notif_index.html', {
+        'room_name': room_name
+    })
 
 def room(request, room_name):
     return render(request, 'chat/chatroom.html', {
