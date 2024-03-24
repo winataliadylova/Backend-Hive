@@ -82,6 +82,9 @@ class WithdrawalSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ChatSerializer(serializers.ModelSerializer):
+    # sender = serializers.SlugRelatedField(many=False, slug_field='username', queryset=UserProfile.objects.all())
+    # receiver = serializers.SlugRelatedField(many=False, slug_field='username', queryset=UserProfile.objects.all())
+    
     class Meta:
         model = Chat
         fields = '__all__'
@@ -105,3 +108,5 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         fields = '__all__'
+
+

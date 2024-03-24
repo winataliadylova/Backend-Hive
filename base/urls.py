@@ -24,6 +24,7 @@ urlpatterns = [
     path('schema/', get_schema_view()),
     path('<str:user>/check-email', views.is_email_exists),
     path('customer/login', views.customer_login),
+    path('chat/<str:room_name>/', views.room, name='room')
 ]
 
 urlpatterns += router.urls

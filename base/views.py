@@ -2,9 +2,13 @@ from rest_framework import generics, permissions
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.parsers import JSONParser
+from django.http.response import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db import connection
+from django.db.models import Subquery, OuterRef, Q
 from .models import *
 from .serializers import *
 
@@ -44,11 +48,11 @@ class WishlistViewSet(viewsets.ModelViewSet):
 class WithdrawalViewSet(viewsets.ModelViewSet):
     queryset = Withdrawal.objects.all()
     serializer_class = WithdrawalSerializer
-
+    
 class ChatRoomViewSet(viewsets.ModelViewSet):
     queryset = ChatRoom.objects.all()
     serializer_class = ChatRoomSerializer
-
+        
 class ChatViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
@@ -56,7 +60,6 @@ class ChatViewSet(viewsets.ModelViewSet):
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
     serializer_class = ReportSerializer
-
 
 ### Helper function
 def dictfetchall(cursor):
@@ -112,3 +115,8 @@ def customer_login (request):
             "customer": CustomerSerializer(customer[0]).data,
             "provider": ProviderSerializer(provider[0]).data if provider else None
         })
+
+def room(request, room_name):
+    return render(request, 'chat/chatroom.html', {
+        'room_name' : room_name
+    })

@@ -32,17 +32,28 @@ CORS_ORIGIN_ALLOW_ALL = True
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
     'django.contrib.staticfiles',
     
     'base.apps.BaseConfig',
     'rest_framework',
-    'corsheaders',
+    
 ]
+
+ASGI_APPLICATION = 'Hive.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default':{
+        'BACKEND':'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -52,7 +63,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'Hive.urls'
@@ -84,11 +94,11 @@ WSGI_APPLICATION = 'Hive.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'yrqkfzcd', 
-        'USER': 'yrqkfzcd', 
-        'PASSWORD': '3uq7MEi8VDCwQj_DSPz3-0jmLv8b8sOa',
-        'HOST': 'rosie.db.elephantsql.com',
-        'PORT': '5432',
+        'NAME': 'pgadmin', 
+        'USER': 'pgadmin', 
+        'PASSWORD': 'wronged-graveyard-deserving-expansive-judicial',
+        'HOST': 's1.arville.net',
+        'PORT': '7898',
     }
 }
 
