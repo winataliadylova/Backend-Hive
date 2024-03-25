@@ -28,7 +28,7 @@ class CarSerializer(serializers.ModelSerializer):
     car_files = CarFileSerializer(queryset, many=True, read_only=True)
     
     provider_id = serializers.PrimaryKeyRelatedField(
-        queryset=Provider.objects.all(), source='provider', write_only=True)
+        queryset=Provider.objects.all(), source='provider', write_only=True, required=False)
     
     class Meta:
         model = Car
