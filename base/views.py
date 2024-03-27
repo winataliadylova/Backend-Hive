@@ -52,10 +52,10 @@ class OrderViewSet(viewsets.ModelViewSet):
         
         provider = self.request.query_params.get('provider_id')
         if provider is not None:
-            queryset = queryset.filter(provider_id = provider)
+            car = Car.objects.all().filter(provider_id = provider)
+            queryset = queryset.filter(car_id__in=car)    
         return queryset
     
-
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer

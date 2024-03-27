@@ -54,9 +54,9 @@ class OrderSerializer(serializers.ModelSerializer):
     payments = PaymentSerializer(queryset, many=True, read_only=True)
     
     car_id = serializers.PrimaryKeyRelatedField(
-        queryset=Car.objects.all(), source='car', write_only=True)
+        queryset=Car.objects.all(), source='car', write_only=True, required=False)
     customer_id = serializers.PrimaryKeyRelatedField(
-        queryset=Customer.objects.all(), source='customer', write_only=True)
+        queryset=Customer.objects.all(), source='customer', write_only=True, required=False)
 
     class Meta:
         model = Order
