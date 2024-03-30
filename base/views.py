@@ -53,7 +53,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         provider = self.request.query_params.get('provider_id')
         if provider is not None:
             car = Car.objects.all().filter(provider_id = provider)
-            queryset = queryset.filter(car_id__in=car)    
+            queryset = queryset.filter(car_id__in = car)    
         return queryset
     
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -75,12 +75,30 @@ class WithdrawalViewSet(viewsets.ModelViewSet):
     serializer_class = WithdrawalSerializer
     
 class ChatRoomViewSet(viewsets.ModelViewSet):
-    queryset = ChatRoom.objects.all()
     serializer_class = ChatRoomSerializer
+    
+    def get_queryset(self):
+        queryset = ChatRoom.objects.all()
+        customer = self.request.query_params.get('customer_id')
+        if customer is not None:
+            queryset = queryset.filter(customer_id = customer)
+            return queryset
+        
+        provider = self.request.query_params.get('provider_id')
+        if provider is not None:
+            queryset = queryset.filter(provider_id = provider)
+        return queryset
         
 class ChatViewSet(viewsets.ModelViewSet):
-    queryset = Chat.objects.all()
     serializer_class = ChatSerializer
+    
+    def get_queryset(self):
+        queryset = Chat.objects.all()
+        
+        room = self.request.query_params.get('chat_room_id')
+        if room is not None:
+            queryset = queryset.filter(chat_room_id = room)
+        return queryset
     
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
@@ -284,7 +302,7 @@ def customer_check_order_schedule (request):
             except CarFile.DoesNotExist:
                 cf = None
                 
-            if cf != None:
+            if cf is not None:
                 serializer = CarFileSerializer(cf, many=True)
                 car['car_files'] = serializer.data
             else:
@@ -332,3 +350,17 @@ def room(request, room_name):
 @api_view(['POST'])
 def image_upload(request):
     return Response(status=201)
+
+### API to check if room already exists and create if not exists
+@api_view(['GET'])
+def get_or_create_room(request):
+    customer = request.query_params.get('customer_id')
+    provider = request.query_params.get('provider_id')
+    
+    try:
+        room = ChatRoom.objects.get(customer_id = customer, provider_id = provider)
+        return Response(ChatRoomSerializer(room).data)
+    except ChatRoom.DoesNotExist:
+        room = ChatRoom(customer_id = customer, provider_id = provider)
+        room.save()
+        return Response(ChatRoomSerializer(room).data, status=201)

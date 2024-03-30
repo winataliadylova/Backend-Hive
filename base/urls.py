@@ -13,8 +13,8 @@ router.register(r'orders', views.OrderViewSet, basename='Order')
 router.register(r'payments', views.PaymentViewSet)
 router.register(r'wishlists', views.WishlistViewSet, basename='Wishlist')
 router.register(r'withdrawals', views.WithdrawalViewSet)
-router.register(r'chat-rooms', views.ChatRoomViewSet)
-router.register(r'chats', views.ChatViewSet)
+router.register(r'chat-rooms', views.ChatRoomViewSet, basename='ChatRoom')
+router.register(r'chats', views.ChatViewSet, basename='Chat')
 router.register(r'reports', views.ReportViewSet)
 router.register(r'notifications', views.NotificationViewSet)
 
@@ -34,7 +34,8 @@ urlpatterns = [
     path('provider/login', views.provider_login),
     path('chat/<str:room_name>/', views.room, name='room'),
     path('orders/rate', views.rate_order),
-    path('img/upload', views.image_upload)
+    path('img/upload', views.image_upload),
+    path('chat-rooms/create-get', views.get_or_create_room)
 ]
 
 urlpatterns += router.urls
