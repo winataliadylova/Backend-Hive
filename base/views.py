@@ -276,9 +276,21 @@ def customer_check_order_schedule (request):
     
     with connection.cursor() as cursor:
         cursor.execute(query, variable)
-        order = dictfetchall(cursor)
+        cars = dictfetchall(cursor)
         
-        return Response(order)
+        for car in cars:
+            try:
+                cf = CarFile.objects.filter(car_id=car.get('id'))
+            except CarFile.DoesNotExist:
+                cf = None
+                
+            if cf != None:
+                serializer = CarFileSerializer(cf, many=True)
+                car['car_files'] = serializer.data
+            else:
+                car['car_files'] = []
+                        
+    return Response(cars)
     
 ### API for customer_dropdown_location
 @api_view(['GET'])
@@ -315,3 +327,8 @@ def room(request, room_name):
     return render(request, 'chat/chatroom.html', {
         'room_name' : room_name
     })
+
+### Dummy endpoint for quasar upload
+@api_view(['POST'])
+def image_upload(request):
+    return Response(status=201)

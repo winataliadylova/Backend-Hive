@@ -22,7 +22,14 @@ def notification_created(sender, instance, created, **kwargs):
         # print(notif[0])
         channel_layer = get_channel_layer()
         # print(instance)
-        room_name = (notif['fields']['type'] + "_" + str(notif['fields']['user_id']))
+        
+        customer_id = notif['fields']['customer_id']
+        if customer_id is None:
+            room_name = 'p_' + str(notif['fields']['provider_id'])
+        else:
+            room_name = 'c_' + str(customer_id)
+        
+        # room_name = (notif['fields']['type'] + "_" + str(notif['fields']['user_id']))
         print("room_name: " + room_name)
         async_to_sync(channel_layer.group_send)(
             room_name,

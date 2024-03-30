@@ -7,7 +7,7 @@ router = routers.DefaultRouter()
 router.register(r'customers', views.CustomerViewSet)
 router.register(r'providers', views.ProviderViewSet)
 router.register(r'cars', views.CarViewSet, basename='Car')
-router.register(r'car-files', views.CarFilesViewSet)
+router.register(r'car-files', views.CarFilesViewSet, basename='CarFile')
 router.register(r'admins', views.AdminViewSet)
 router.register(r'orders', views.OrderViewSet, basename='Order')
 router.register(r'payments', views.PaymentViewSet)
@@ -33,7 +33,8 @@ urlpatterns = [
 
     path('provider/login', views.provider_login),
     path('chat/<str:room_name>/', views.room, name='room'),
-    path('orders/rate', views.rate_order)
+    path('orders/rate', views.rate_order),
+    path('img/upload', views.image_upload)
 ]
 
 urlpatterns += router.urls
