@@ -87,7 +87,7 @@ class ChatSerializer(serializers.ModelSerializer):
 class ChatRoomSerializer(serializers.ModelSerializer):
     customer = CustomerSerializer(read_only=True)
     provider = ProviderSerializer(read_only=True)
-    queryset = Chat.objects.prefetch_related('chat')
+    queryset = Chat.objects.prefetch_related('chats')
     chats = ChatSerializer(queryset, many=True, read_only=True)
 
     customer_id = serializers.PrimaryKeyRelatedField(

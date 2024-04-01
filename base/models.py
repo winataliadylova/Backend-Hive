@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 # Create your models here.
 
@@ -127,7 +128,7 @@ class ChatRoom(models.Model):
 
 class Chat(models.Model):
     id = models.BigAutoField(primary_key=True)
-    chat_room_id = models.ForeignKey(ChatRoom, related_name="chat", on_delete=models.CASCADE, db_column="chat_room_id")
+    chat_room_id = models.ForeignKey(ChatRoom, related_name="chats", on_delete=models.CASCADE, db_column="chat_room_id")
     # sender = models.CharField(max_length=200)
     # receiver = models.CharField(max_length=200)
     provider_id = models.ForeignKey(Provider, related_name="provider", on_delete=models.CASCADE, db_column="provider_id", null=True)
@@ -171,13 +172,13 @@ class Order(models.Model):
 class Payment(models.Model):
     id = models.BigAutoField(primary_key=True)
     order_id = models.ForeignKey(Order, related_name="payments", on_delete=models.SET_NULL, null=True, db_column="order_id")
-    invoice_no = models.CharField(max_length=100)
-    payment_method = models.CharField(max_length=100)
+    invoice_no = models.CharField(max_length=100, null=True)
+    payment_method = models.CharField(max_length=100, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=0, null=True)
-    transaction_datetime = models.DateTimeField(auto_now_add=True)
+    transaction_datetime = models.DateTimeField(null=True, default=datetime.now)
     deposit_return_time = models.DateTimeField(null=True)
     refund_datetime = models.DateTimeField(null=True)
-    status = models.CharField(max_length=15, default="IN")
+    status = models.CharField(max_length=15, default="IN", null=True)
    
     class Meta:
         db_table = "payment"
