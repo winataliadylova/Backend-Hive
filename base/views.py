@@ -12,6 +12,9 @@ from django.db.models import Subquery, OuterRef, Q
 from .models import *
 from .serializers import *
 import json
+from datetime import datetime
+import requests
+import decimal
 
 # Create your views here.
 
@@ -54,7 +57,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         if provider is not None:
             car = Car.objects.all().filter(provider_id = provider)
             queryset = queryset.filter(car_id__in = car)    
-        return queryset
+        return queryset.order_by('-updated_datetime')
     
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
@@ -69,10 +72,6 @@ class WishlistViewSet(viewsets.ModelViewSet):
         if customer is not None:
             queryset = queryset.filter(customer_id = customer)
         return queryset
-
-class WithdrawalViewSet(viewsets.ModelViewSet):
-    queryset = Withdrawal.objects.all()
-    serializer_class = WithdrawalSerializer
     
 class ChatRoomViewSet(viewsets.ModelViewSet):
     serializer_class = ChatRoomSerializer
@@ -99,6 +98,17 @@ class ChatViewSet(viewsets.ModelViewSet):
         if room is not None:
             queryset = queryset.filter(chat_room_id = room)
         return queryset
+    
+class BalanceHistoryViewSet(viewsets.ModelViewSet):
+    serializer_class = BalanceHistorySerializer
+    
+    def get_queryset(self):
+        queryset = BalanceHistory.objects.all()
+        
+        provider = self.request.query_params.get('provider_id')
+        if provider is not None:
+            queryset = queryset.filter(provider_id = provider)
+        return queryset.order_by('-transaction_datetime')
     
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
@@ -364,3 +374,65 @@ def get_or_create_room(request):
         room = ChatRoom(customer_id = customer, provider_id = provider)
         room.save()
         return Response(ChatRoomSerializer(room).data, status=201)
+
+@api_view(['GET'])
+def get_time(request):
+    return Response(datetime.now())
+
+@api_view(['POST'])
+def complete_order(request, **kwargs):
+    id = kwargs['id']
+    provider_id = request.data['provider_id']
+    order = Order.objects.get(id = id)
+    order.status = '4'
+    order.save()
+    
+    provider = Provider.objects.get(id = provider_id)
+    provider.balance = provider.balance + decimal.Decimal(order.base_price)
+    provider.save()
+    
+    balance_history = BalanceHistory(provider_id = provider, amount = order.base_price, is_income = True)
+    balance_history.save()
+    
+    payments = Payment.objects.filter(order_id = id)
+    first_payment = payments[0]
+    first_payment.deposit_return_time = datetime.now()
+    first_payment.save()
+    
+    return Response()
+
+@api_view(['GET'])
+def get_bank_list(request):
+    url = 'https://api-rekening.lfourr.com/listBank'
+    response = requests.get(url)
+    data = response.json()
+    return JsonResponse(data)
+
+@api_view(['GET'])
+def get_bank_account(request):
+    bankCode = request.query_params.get('bank_code')
+    accountNumber = request.query_params.get('acc_number')
+    
+    url = 'https://api-rekening.lfourr.com/getBankAccount'
+    params = {
+        'bankCode': bankCode,
+        'accountNumber': accountNumber
+    }
+    response = requests.get(url, params = params)
+    data = response.json()
+    return JsonResponse(data)
+
+@api_view(['POST'])
+def withdraw(request):
+    provider_id = request.data['provider_id']
+    amount = request.data['amount']
+    
+    provider = Provider.objects.all().get(id = provider_id)
+    provider.balance = provider.balance - decimal.Decimal(amount)
+    print('balance', provider.balance)
+    provider.save()
+    
+    balance_history = BalanceHistory(provider_id = provider, amount = amount, is_income = False)
+    balance_history.save()
+    
+    return Response()

@@ -50,6 +50,7 @@ class Provider(models.Model):
     address = models.CharField(max_length=150,null=True, blank=True)
     city = models.CharField(max_length=50,null=True, blank=True)
     province = models.CharField(max_length=50,null=True, blank=True)
+    bank_code = models.CharField(max_length=4,null=True, blank=True)
     bank_account_number = models.CharField(max_length=50,null=True, blank=True)
     bank_account_name = models.CharField(max_length=50,null=True, blank=True)
     id_card = models.CharField(max_length=50,null=True, blank=True)
@@ -148,12 +149,13 @@ class Chat(models.Model):
 class Order(models.Model):
     id = models.BigAutoField(primary_key=True)
     car = models.ForeignKey(Car, related_name="orders", on_delete=models.SET_NULL, null=True, db_column="car_id")
-    customer = models.ForeignKey(Customer, related_name="orders", on_delete=models.SET_NULL, null=True, db_column="customer_id")
+    customer_id = models.ForeignKey(Customer, related_name="orders", on_delete=models.SET_NULL, null=True, db_column="customer_id")
     start_datetime = models.DateTimeField(null=True)
     end_datetime = models.DateTimeField(null=True)
     pickup_location = models.CharField(max_length=100, null=True)
     return_location = models.CharField(max_length=100, null=True)
     status = models.CharField(max_length=15, null=True)
+    base_price = models.DecimalField(max_digits=10, decimal_places=0, null=True)
     transport_fee = models.DecimalField(max_digits=10, decimal_places=0, default=0, null=True)
     damage_fee = models.DecimalField(max_digits=10, decimal_places=0, default=0, null=True)
     late_fee = models.DecimalField(max_digits=10, decimal_places=0, default=0, null=True)
@@ -217,18 +219,19 @@ class Wishlist(models.Model):
     def wishlist(self):
         return Wishlist
    
-class Withdrawal(models.Model):
+class BalanceHistory(models.Model):
     id = models.BigAutoField(primary_key=True)
-    provider_id = models.ForeignKey(Provider, related_name="withdrawals", on_delete=models.CASCADE, db_column="provider_id")
+    provider_id = models.ForeignKey(Provider, related_name="balance_histories", on_delete=models.CASCADE, db_column="provider_id")
     amount = models.DecimalField(max_digits=10, decimal_places=0)
-    withdraw_datetime = models.DateTimeField(auto_now_add=True)
+    transaction_datetime = models.DateTimeField(null=True, default=datetime.now)
+    is_income = models.BooleanField(null=True)
    
     class Meta:
-        db_table = "withdrawal"
+        db_table = "balance_history"
         managed = False
    
-    def withdrawal(self):
-        return Withdrawal
+    def BalanceHistory(self):
+        return BalanceHistory
     
 class Notification(models.Model):
     id = models.BigAutoField(primary_key=True)

@@ -106,7 +106,7 @@ DATABASES = {
         'NAME': 'pgadmin', 
         'USER': 'pgadmin', 
         'PASSWORD': 'wronged-graveyard-deserving-expansive-judicial',
-        'HOST': 's1.arville.net',
+        'HOST': 's3.arville.net',
         'PORT': '7898',
     }
 }

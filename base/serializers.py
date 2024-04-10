@@ -49,14 +49,11 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     car = CarSerializer(read_only=True)
-    customer = CustomerSerializer(read_only=True)
     queryset = Order.objects.prefetch_related('payments')
     payments = PaymentSerializer(queryset, many=True, read_only=True)
     
     car_id = serializers.PrimaryKeyRelatedField(
         queryset=Car.objects.all(), source='car', write_only=True, required=False)
-    customer_id = serializers.PrimaryKeyRelatedField(
-        queryset=Customer.objects.all(), source='customer', write_only=True, required=False)
 
     class Meta:
         model = Order
@@ -71,9 +68,9 @@ class WishlistSerializer(serializers.ModelSerializer):
         model = Wishlist
         fields = '__all__'
 
-class WithdrawalSerializer(serializers.ModelSerializer):
+class BalanceHistorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Withdrawal
+        model = BalanceHistory
         fields = '__all__'
 
 class ChatSerializer(serializers.ModelSerializer):
