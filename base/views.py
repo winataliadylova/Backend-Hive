@@ -57,7 +57,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         if provider is not None:
             car = Car.objects.all().filter(provider_id = provider)
             queryset = queryset.filter(car_id__in = car)    
-        return queryset.order_by('-updated_datetime')
+        return queryset.order_by('-created_datetime')
     
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
