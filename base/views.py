@@ -401,6 +401,20 @@ def complete_order(request, **kwargs):
     
     return Response()
 
+@api_view(['POST'])
+def cancel_order(request, **kwargs):
+    id = kwargs['id']
+    order = Order.objects.get(id = id)
+    order.status = '5'
+    order.save()
+    
+    payments = Payment.objects.filter(order_id = id)
+    first_payment = payments[0]
+    first_payment.deposit_return_time = datetime.now()
+    first_payment.save()
+    
+    return Response()
+
 @api_view(['GET'])
 def get_bank_list(request):
     url = 'https://api-rekening.lfourr.com/listBank'

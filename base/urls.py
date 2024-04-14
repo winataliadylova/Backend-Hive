@@ -34,6 +34,7 @@ urlpatterns = [
     path('provider/login', views.provider_login),
     path('chat/<str:room_name>/', views.room, name='room'),
     path('orders/complete/<str:id>', views.complete_order),
+    path('orders/cancel/<str:id>', views.cancel_order),
     path('orders/rate', views.rate_order),
     path('img/upload', views.image_upload),
     path('chat-rooms/create-get', views.get_or_create_room),
