@@ -48,15 +48,14 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     
     def get_queryset(self):
-        queryset = Order.objects.all()
+        queryset = Order.objects.select_related('car').all()
         customer = self.request.query_params.get('customer_id')
         if customer is not None:
             queryset = queryset.filter(customer_id = customer)
         
         provider = self.request.query_params.get('provider_id')
         if provider is not None:
-            car = Car.objects.all().filter(provider_id = provider)
-            queryset = queryset.filter(car_id__in = car)    
+            queryset = queryset.filter(car__provider = provider)
         return queryset.order_by('-created_datetime')
     
 class PaymentViewSet(viewsets.ModelViewSet):
