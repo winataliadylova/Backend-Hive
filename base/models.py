@@ -235,11 +235,12 @@ class BalanceHistory(models.Model):
     
 class Notification(models.Model):
     id = models.BigAutoField(primary_key=True)
-    isread = models.CharField(max_length=15, null=True)
+    isread = models.CharField(max_length=15, null=True, default='0')
     # user_id = models.BigIntegerField()
     # type = models.CharField(max_length=30)
     provider_id = models.ForeignKey(Provider, related_name="providers", on_delete=models.CASCADE, db_column="provider_id", null=True)
     customer_id = models.ForeignKey(Customer, related_name="customers", on_delete=models.CASCADE, db_column="customer_id", null=True)
+    title = models.CharField(max_length=255, null=True)
     message = models.TextField(null=True)
     created_datetime = models.DateTimeField(auto_now_add=True)
     

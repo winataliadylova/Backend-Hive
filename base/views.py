@@ -114,8 +114,18 @@ class ReportViewSet(viewsets.ModelViewSet):
     serializer_class = ReportSerializer
     
 class NotificationViewSet(viewsets.ModelViewSet):
-    queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
+    
+    def get_queryset(self):
+        queryset = Notification.objects.all()
+        customer = self.request.query_params.get('customer_id')
+        if customer is not None:
+            queryset = queryset.filter(customer_id = customer)
+        
+        provider = self.request.query_params.get('provider_id')
+        if provider is not None:
+            queryset = queryset.filter(provider_id = provider)
+        return queryset.order_by('-created_datetime')
 
 ### Helper function
 def dictfetchall(cursor):

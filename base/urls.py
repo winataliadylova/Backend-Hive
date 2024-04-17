@@ -16,7 +16,7 @@ router.register(r'chat-rooms', views.ChatRoomViewSet, basename='ChatRoom')
 router.register(r'chats', views.ChatViewSet, basename='Chat')
 router.register(r'balance-histories', views.BalanceHistoryViewSet, basename='BalanceHistory')
 router.register(r'reports', views.ReportViewSet)
-router.register(r'notifications', views.NotificationViewSet)
+router.register(r'notifications', views.NotificationViewSet, basename='Notification')
 
 urlpatterns = [
     path('', include(router.urls)),
