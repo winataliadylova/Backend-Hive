@@ -38,6 +38,7 @@ urlpatterns = [
     path('orders/rate', views.rate_order),
     path('img/upload', views.image_upload),
     path('chat-rooms/create-get', views.get_or_create_room),
+    path('chats/read/<str:user>/<str:id>', views.read_chat),
     path('list-bank', views.get_bank_list),
     path('bank-account', views.get_bank_account),
     path('withdraw', views.withdraw),

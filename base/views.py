@@ -459,3 +459,15 @@ def withdraw(request):
     balance_history.save()
     
     return Response()
+
+@api_view(['POST'])
+def read_chat(request, **kwargs):
+    room_id = kwargs['id']
+    user_type = kwargs['user']
+    
+    if (user_type == 'provider'):
+        Chat.objects.filter(chat_room_id = room_id).filter(provider_id__isnull = False).update(isread='1')
+    else:
+        Chat.objects.filter(chat_room_id = room_id).filter(customer_id__isnull = False).update(isread='1')
+        
+    return Response()
