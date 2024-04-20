@@ -237,7 +237,7 @@ def customer_check_order_schedule (request):
     
     query = "SELECT * FROM public.car WHERE isdelete = %s AND status = %s AND provider_id IN (SELECT id FROM provider WHERE LOWER(province) = %s AND LOWER(city) = %s) AND id NOT IN (SELECT car_id FROM public.order WHERE status < %s AND (start_datetime BETWEEN %s AND %s OR end_datetime BETWEEN %s AND %s))"
     
-    variable = ['0', 'A', province, city, '5',start_date, end_date, start_date, end_date]
+    variable = ['0', '1', province, city, '5', start_date, end_date, start_date, end_date]
     
     # if start_price is not None:
     #     temp = " AND price BETWEEN %s AND %s"
