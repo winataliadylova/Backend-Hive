@@ -15,6 +15,7 @@ import json
 from datetime import datetime
 import requests
 import decimal
+from django.utils.crypto import get_random_string
 
 # Create your views here.
 
@@ -382,7 +383,7 @@ def get_or_create_room(request):
     except ChatRoom.DoesNotExist:
         room = ChatRoom(customer_id = customer, provider_id = provider)
         room.save()
-        return Response(ChatRoomSerializer(room).data, status=201)
+        return Response(ChatRoomSerializer(room).data, status = 201)
 
 @api_view(['GET'])
 def get_time(request):
@@ -466,8 +467,63 @@ def read_chat(request, **kwargs):
     user_type = kwargs['user']
     
     if (user_type == 'provider'):
-        Chat.objects.filter(chat_room_id = room_id).filter(provider_id__isnull = False).update(isread='1')
+        Chat.objects.filter(chat_room_id = room_id).filter(provider_id__isnull = False).update(is_read=True)
     else:
-        Chat.objects.filter(chat_room_id = room_id).filter(customer_id__isnull = False).update(isread='1')
+        Chat.objects.filter(chat_room_id = room_id).filter(customer_id__isnull = False).update(is_read=True)
         
+    return Response()
+
+@api_view(['POST'])
+def initiate_payment(request):
+    order_id = request.data['order_id']
+    amount = request.data['amount']
+    invoice_no = get_random_string(10).upper()
+    # print(invoice_no)
+    
+    while Payment.objects.filter(invoice_no = invoice_no).exists():
+        invoice_no = get_random_string(10).upper() 
+    
+    url = 'https://app.sandbox.midtrans.com/snap/v1/transactions'
+    headers = {
+        'Authorization': 'Basic U0ItTWlkLXNlcnZlci0xamI1RmlEcUwtanVCZU1LX2hoWkFqaDk6',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'transaction_details': {
+            'order_id': invoice_no,
+            'gross_amount': amount
+        }, 
+        'credit_card': {
+            'secure': True
+        }
+    }
+    # print('request', json.dumps(data))
+    response = requests.post(url, headers = headers, data = json.dumps(data))
+    # print('response', response.json())
+    token  = response.json()['token']
+    order = Order.objects.get(id = order_id)
+    payment = Payment(order_id = order, invoice_no = invoice_no, amount = amount, token = token, status = 'IN')
+    payment.save()
+    
+    return Response(PaymentSerializer(payment).data, status = 201)
+
+@api_view(['POST'])
+def callback_payment(request):
+    invoice_no = request.data['order_id']
+    ref_no = request.data['transaction_id']
+    payment_method = request.data['payment_type']
+    approval_code = request.data.get('approval_code')
+    
+    payment = Payment.objects.get(invoice_no = invoice_no)
+    payment.status = 'PA'
+    payment.payment_method = payment_method
+    payment.reference_number = ref_no
+    payment.approval_code = approval_code
+    payment.save()
+    
+    order = Order.objects.get(id = payment.order_id.id)
+    order.status = '1'
+    order.save()
+
     return Response()

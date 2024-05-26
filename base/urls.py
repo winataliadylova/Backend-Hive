@@ -10,7 +10,7 @@ router.register(r'cars', views.CarViewSet, basename='Car')
 router.register(r'car-files', views.CarFilesViewSet, basename='CarFile')
 router.register(r'admins', views.AdminViewSet)
 router.register(r'orders', views.OrderViewSet, basename='Order')
-router.register(r'payments', views.PaymentViewSet)
+router.register(r'payments', views.PaymentViewSet, basename='Payment')
 router.register(r'wishlists', views.WishlistViewSet, basename='Wishlist')
 router.register(r'chat-rooms', views.ChatRoomViewSet, basename='ChatRoom')
 router.register(r'chats', views.ChatViewSet, basename='Chat')
@@ -42,6 +42,8 @@ urlpatterns = [
     path('list-bank', views.get_bank_list),
     path('bank-account', views.get_bank_account),
     path('withdraw', views.withdraw),
+    path('payment/initiate', views.initiate_payment),
+    path('payment/callback', views.callback_payment),
 ]
 
 urlpatterns += router.urls
