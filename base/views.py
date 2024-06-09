@@ -12,10 +12,11 @@ from django.db.models import Subquery, OuterRef, Q
 from .models import *
 from .serializers import *
 import json
-from datetime import datetime
+from datetime import datetime, date
 import requests
 import decimal
 from django.utils.crypto import get_random_string
+import locale
 
 # Create your views here.
 
@@ -525,5 +526,15 @@ def callback_payment(request):
     order = Order.objects.get(id = payment.order_id.id)
     order.status = '1'
     order.save()
+    
+    locale.setlocale(locale.LC_ALL, 'id')
+    message = 'Pembayaranmu untuk sewa mobil {car} pada {date} telah diterima.'
+    message = message.replace('{car}', order.car.brand).replace('{date}', date.today().strftime("%d %b %Y"))
+    print(message)
+    locale.setlocale(locale.LC_ALL, '')
+    notif = Notification(isread = False, provider_id = order.car.provider, customer_id = order.customer_id, 
+                         title = 'Pembayaran diterima', message = message)
+    notif.save()
+    
 
     return Response()
