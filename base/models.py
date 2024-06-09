@@ -180,7 +180,7 @@ class Payment(models.Model):
     transaction_datetime = models.DateTimeField(null=True, default=datetime.now)
     token = models.CharField(max_length=36, null=True)
     reference_number = models.CharField(max_length=36, null=True)
-    approval_code = models.CharField(max_length=6, null=True)
+    approval_code = models.CharField(max_length=20, null=True)
     deposit_return_time = models.DateTimeField(null=True)
     refund_datetime = models.DateTimeField(null=True)
     status = models.CharField(max_length=15, default="IN", null=True)
