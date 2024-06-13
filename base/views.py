@@ -527,11 +527,11 @@ def callback_payment(request):
     order.status = '1'
     order.save()
     
-    locale.setlocale(locale.LC_ALL, 'id')
+    # locale.setlocale(locale.LC_ALL, 'id')
     message = 'Pembayaranmu untuk sewa mobil {car} pada {date} telah diterima.'
-    message = message.replace('{car}', order.car.brand).replace('{date}', date.today().strftime("%d %b %Y"))
-    # print(message)
-    locale.setlocale(locale.LC_ALL, '')
+    message = message.replace('{car}', order.car.brand).replace('{date}', date.today().strftime("%A, %d %b %Y"))
+    print(message)
+    # locale.setlocale(locale.LC_ALL, '')
     notif = Notification(isread = '0', provider_id = order.car.provider, customer_id = order.customer_id, 
                          title = 'Pembayaran diterima', message = message)
     notif.save()
